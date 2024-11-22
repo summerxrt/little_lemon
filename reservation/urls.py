@@ -7,9 +7,10 @@ router = DefaultRouter()
 router.register(r'groups/manager/users', views.GroupViewSet, basename='group-manager-users')
 
 urlpatterns = [
-    #path('admin/', admin.site.urls),
+    path('auth/', include('djoser.urls')),
+    path('auth/', include('djoser.urls.authtoken')),
     path('reservation/menu/', views.menu_view, name='menu'),
-    path('', views.ApiRootView.as_view(), name='api-root'),
+    path('', views.index_view, name='index'),  # Ensure this line points to index_view
     path('categories/', views.CategoriesView.as_view(), name='categories'),
     path('menu-items/', views.MenuItemListView.as_view(), name='menu-items'),
     path('menu-items/category/', views.CategoriesView.as_view(), name='menu-items-category'),

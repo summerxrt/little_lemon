@@ -17,9 +17,18 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from django.shortcuts import redirect
+from rest_framework.authtoken.views import obtain_auth_token
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('reservation/', include('reservation.urls')),
-    path('', lambda request: redirect('reservation/', permanent=False)),  # Redirect root URL to reservation
+    path('', lambda request: redirect('reservation/', permanent=False)),
+    path('api-token-auth/', obtain_auth_token),
 ]
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns

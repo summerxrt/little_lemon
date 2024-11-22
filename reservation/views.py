@@ -21,6 +21,9 @@ from .forms import BookingForm
 from django.core import serializers
 from .permissions import IsManager, IsDeliveryCrew
 
+
+def index_view(request):
+    return render(request, 'index.html')
 # Root API view for a welcome message and endpoint guide
 class ApiRootView(View):
     def get(self, request):
