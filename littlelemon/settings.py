@@ -29,7 +29,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_filters',
-    'reservation',
+    'restaurant',
     'debug_toolbar',
     'rest_framework',
     'rest_framework.authtoken',
@@ -88,7 +88,10 @@ USE_I18N = True
 USE_TZ = True
 
 STATIC_URL = 'static/'
-STATICFILES_DIRS = [BASE_DIR / 'reservation/static/']
+STATICFILES_DIRS = [
+    BASE_DIR / 'restaurant/static',  # Update from 'reservation' to 'restaurant'
+]
+
 
 REST_FRAMEWORK = {
     'DEFAULT_RENDERER_CLASSES': [
