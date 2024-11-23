@@ -7,4 +7,11 @@ API Paths for Testing:
 - /accounts/login/  (User login)
 - /accounts/logout/  (User logout)
 
-Please test CRUD operations for reservations and other functionalities.
+Menu-Related Endpoints:
+- /reservation/menu/  (View restaurant menu)
+- /reservation/menu-items/  (Get all menu items)
+- /reservation/menu-items/category/  (Get menu items by category)
+- /reservation/menu-items/<item_id>/  (Get, update, or delete a specific menu item)
+
+Please test CRUD operations for reservations, bookings, and menu items.
+
