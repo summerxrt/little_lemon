@@ -19,14 +19,29 @@ from django.urls import include, path
 from django.shortcuts import redirect
 from rest_framework.authtoken.views import obtain_auth_token
 from django.conf import settings
+from reservation import views
 
 urlpatterns = [
+    # Admin panel
     path('admin/', admin.site.urls),
+
+    # Reservation app URLs
     path('reservation/', include('reservation.urls')),
+
+    # Redirect root to reservation
     path('', lambda request: redirect('reservation/', permanent=False)),
+
+    # Token-based authentication (DRF)
     path('api-token-auth/', obtain_auth_token),
+
+    # User authentication URLs (login, logout, password reset, etc.)
+    path('accounts/', include('django.contrib.auth.urls')),
+
+    # Signup view for new user registration
+    path('accounts/signup/', views.signup_view, name='signup'),
 ]
 
+# Add Debug Toolbar when in DEBUG mode
 if settings.DEBUG:
     import debug_toolbar
     urlpatterns = [

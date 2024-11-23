@@ -4,112 +4,100 @@
 {% block content %}
 <section>
   <article>
-    <h1>Make a reservation</h1>
-    <!--Begin row-->
+    <h1>Make a Reservation</h1>
     <div class="row">
-      <!--Begin col-->
       <div class="column">
+        <!-- Display form errors if present -->
+        <div id="form-errors" style="color: red;"></div>
+        <form method="POST" action="{% url 'book' %}" id="form">
           {% csrf_token %}
-          <form method="POST" id="form">
-            <p>
-              <label for="first_name">Name:</label>
-              <input type="text" placeholder="Your Name" maxlength="200" required="" id="first_name">
-            </p>
-            <p>
-              <label for="reservation_date">Reservation Date:</label>
-              <input type="date" id="reservation_date" name="reservation_date">
-           </p>
-            <p>
-              <label for="reservation_slot">Reservation time:</label>
-              <select id="reservation_slot">
-                <option value="0" disabled>Select time</option>
-              </select>
-            </p>
-            <button type="button" id="button">Reserve</button>
-          </form>
+          <p>
+            <label for="customer_name">Name:</label>
+            <input type="text" id="customer_name" name="customer_name" placeholder="Your Name" maxlength="100" required>
+          </p>
+          <p>
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" placeholder="Your Email" required>
+          </p>
+          <p>
+            <label for="reservation_date">Reservation Date:</label>
+            <input type="date" id="reservation_date" name="reservation_date" required>
+          </p>
+          <p>
+            <label for="reservation_slot">Time:</label>
+            <select id="reservation_slot" name="reservation_slot" required>
+              <option value="" disabled selected>Select a time</option>
+              {% for hour in hours %}
+                <option value="{{ hour }}">{{ hour }}</option>
+              {% endfor %}
+            </select>
+          </p>
+          <p>
+            <label for="table_number">Table Number:</label>
+            <input type="number" id="table_number" name="table_number" placeholder="Table Number" min="1" required>
+          </p>
+          <p>
+            <label for="booking_date">Booking Date:</label>
+            <input type="date" id="booking_date" name="booking_date" required>
+          </p>
+          <button type="submit" id="button">Book Now</button>
+        </form>
       </div>
-      <!--End col-->
-
-      <!--Begin col-->
-      <div class="column">
-        <h2>Bookings For <span id="today"></span></h2>
-        <div id="bookings">
-        </div>
-      </div>
-      <!--End col-->
     </div>
-    <!--End row-->
   </article>
 </section>
+
 <script>
-  const date = new Date()
-  document.getElementById('reservation_date').value = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, "0")}-${date.getDate().toString().padStart(2, "0")}`
+  document.getElementById('form').addEventListener('submit', function(event) {
+    event.preventDefault(); // Prevent default form submission
 
-  console.log(document.getElementById('reservation_date').value)
-  getBookings()
-
-  // Step 10: Part two
-  document.getElementById('reservation_date').addEventListener('change', function() {
-    getBookings();
-  });
-
-  function getBookings() {
-    let reserved_slots = []
-    const date = document.getElementById('reservation_date').value
-    document.getElementById('today').innerHTML = date
-    
-    fetch("{% url 'bookings' %}" + '?date=' + date)
-      .then(r => r.json())
-      .then(data => {
-        reserved_slots = []
-        let bookings = ''
-        
-        // Step 11: Part three
-        data.forEach(item => {
-          console.log(item.fields);
-          reserved_slots.push(item.fields.reservation_slot);
-          bookings += `<p>${item.fields.first_name} - ${formatTime(item.fields.reservation_slot)}</p>`;
-        });
-
-        // Step 12: Part four
-        let slot_options = '<option value="0" disabled>Select time</option>';
-        for (let i = 10; i < 20; i++) {
-          const label = formatTime(i);
-          if (reserved_slots.includes(i)) {
-            slot_options += `<option value=${i} disabled>${label}</option>`;
-          } else {
-            slot_options += `<option value=${i}>${label}</option>`;
-          }
-        }
-        
-        document.getElementById('reservation_slot').innerHTML = slot_options
-        if(bookings == ''){
-          bookings = "No bookings"
-        }
-        document.getElementById('bookings').innerHTML = bookings
-      })
-  }
-
-  function formatTime(time) {
-    const ampm = time < 12 ? 'AM' : 'PM'
-    const t = time < 12 ? time : time > 12 ? time - 12 : time
-    const label = `${t} ${ampm}`
-    return label
-  }
-
-  document.getElementById('button').addEventListener('click', function (e) {
-    const formdata = {
-      first_name: document.getElementById('first_name').value,
+    // Collect form data manually to ensure everything is correctly formatted
+    const formData = {
+      customer_name: document.getElementById('customer_name').value,
+      email: document.getElementById('email').value,
       reservation_date: document.getElementById('reservation_date').value,
-      reservation_slot: document.getElementById('reservation_slot').value,
-    }
+      reservation_slot: parseInt(document.getElementById('reservation_slot').value, 10), // Ensure this is a number
+      table_number: parseInt(document.getElementById('table_number').value, 10), // Ensure this is a number
+      booking_date: document.getElementById('booking_date').value
+    };
 
-    fetch("{% url 'bookings' %}", { method: 'post', body: JSON.stringify(formdata) })
-      .then(r => r.text())
-      .then(data => {
-        getBookings()
-      })
-  })
+    // Make the POST request to the book view
+    fetch("{% url 'book' %}", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value,
+      },
+      body: JSON.stringify(formData),  // Send JSON data
+    })
+    .then(response => {
+      if (!response.ok) {
+        return response.json().then(data => {
+          throw data; // Throw the JSON response if there is an error
+        });
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.message) {
+        alert(data.message);
+        window.location.reload();
+      }
+    })
+    .catch(errorData => {
+      // Show validation errors on the page if present
+      let errorHtml = '<ul>';
+      if (errorData.errors) {
+        for (const [key, errors] of Object.entries(errorData.errors)) {
+          errorHtml += `<li>${key}: ${errors.join(', ')}</li>`;
+        }
+      } else if (errorData.error) {
+        errorHtml += `<li>${errorData.error}</li>`;
+      }
+      errorHtml += '</ul>';
+      document.getElementById('form-errors').innerHTML = errorHtml;
+    });
+  });
 </script>
-{% endblock %}
 
+{% endblock %}

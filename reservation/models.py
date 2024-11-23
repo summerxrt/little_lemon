@@ -59,18 +59,23 @@ class OrderItem(models.Model):
 
     def __str__(self):
         return f"{self.quantity} x {self.menuitem.title} in order #{self.order.id}"
-    
- # Booking model for table reservations
+
+# Booking model for table reservations
+from django.utils import timezone
+
 class Booking(models.Model):
-    customer_name = models.CharField(max_length=100, default='Unknown')  # Providing a default value
+    customer_name = models.CharField(max_length=100, default="Anonymous")
     email = models.EmailField()
     table_number = models.IntegerField(null=True)
-  # Setting default to 1
-    booking_date = models.DateTimeField(default=timezone.now)  # Using timezone.now as default
+    reservation_date = models.DateTimeField(default=timezone.now)
+    reservation_slot = models.IntegerField(default=1)
+    booking_date = models.DateTimeField(default=timezone.now)  # Automatically use the current date
 
     def __str__(self):
-        return f"Booking for {self.customer_name} on {self.booking_date}" 
-    
+        return f"Booking for {self.customer_name} on {self.reservation_date}"
+
+
+# Reservation model (if needed separately)
 class Reservation(models.Model):
     customer_name = models.CharField(max_length=100)
     email = models.EmailField()
@@ -80,6 +85,7 @@ class Reservation(models.Model):
     def __str__(self):
         return f"Reservation for {self.customer_name} on {self.reservation_date}"
 
+# Menu model for restaurant menu items
 class Menu(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
@@ -87,3 +93,14 @@ class Menu(models.Model):
 
     def __str__(self):
         return self.name
+
+class Booking(models.Model):
+    customer_name = models.CharField(max_length=100, default="Anonymous")
+    email = models.EmailField()
+    table_number = models.IntegerField(null=True)
+    reservation_date = models.DateTimeField(default=timezone.now)
+    reservation_slot = models.IntegerField(default=1)
+    booking_date = models.DateTimeField(default=timezone.now)  # Automatically set to current time
+
+    def __str__(self):
+        return f"Booking for {self.customer_name} on {self.reservation_date}"

@@ -1,13 +1,15 @@
 {% load static %}
 <header>
-  <img src="{% static 'img/logo.png' %}" />
+  <img src="{% static 'img/logo.png' %}" alt="Little Lemon Logo" />
 </header>
 <nav>
   <ul>
     <li><a href="{% url 'home' %}">Home</a></li>
     <li><a href="{% url 'about' %}">About</a></li>
     <li><a href="{% url 'menu' %}">Menu</a></li>
-    <li><a href="{% url 'book' %}">Book</a></li>
-    <li><a href="{% url 'reservations' %}">Reservations</a></li>
+    <li><a href="{% url 'book' %}">Book</a></li> <!-- Added Book -->
+    <li><a href="{% url 'bookings' %}">Reservations</a></li> <!-- Added Reservations -->
   </ul>
 </nav>
+
+
